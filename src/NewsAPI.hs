@@ -48,28 +48,6 @@ instance FromJSON Article
 type PageNumber = Int
 type PageSize = Int
 
-clientManager :: App Manager
-clientManager = liftIO . newManager $ tlsManagerSettings
-
-fetchTopNewsArticles :: Maybe PageNumber -> Maybe PageSize -> App Response
-fetchTopNewsArticles pn ps = do
-    liftIO $ putStrLn "fetchTopNewsArticles"
-    key <- asks newsAPIKey
-    manager <- clientManager
-    request <- liftIO . parseRequest . getTopNewsUrl key pn $ ps
-    
-    liftIO $ putStrLn "fetchTopNewsArticles1"
-
-    let userAgentHeader = ("User-Agent", "NewsAPI/1.0")
-        request1 = request { requestHeaders = userAgentHeader : requestHeaders request }
-    
-    response <- liftIO $ httpLbs request1 manager
-    liftIO $ putStrLn "fetchTopNewsArticles2"
-
-    let jsonBody = responseBody response :: LZB.ByteString
-    return . fromMaybe (error ("error with api" <> show jsonBody)) . decode $ jsonBody
-
-
 
 type URL = String
 getTopNewsUrl :: NewsAPIKey -> Maybe PageNumber -> Maybe PageSize -> URL
@@ -79,8 +57,39 @@ getTopNewsUrl k pn ps
         <> "&apiKey=" <> unpack k
 
 
+fetchTopNewsArticles :: Maybe PageNumber -> Maybe PageSize -> App Response
+fetchTopNewsArticles pn ps = do
+    key <- asks newsAPIKey
+    let u = getTopNewsUrl key pn $ ps
+    fetch u
 
---  fetching N news articles
+
+clientManager :: App Manager
+clientManager = liftIO . newManager $ tlsManagerSettings
+
+
+fetch :: forall a .FromJSON a => URL -> App a
+fetch u = do
+    liftIO $ putStrLn "fetch"
+    manager <- clientManager
+    request <- liftIO . parseRequest $ u
+    
+    liftIO $ putStrLn "fetch1"
+
+    let userAgentHeader = ("User-Agent", "NewsAPI/1.0")
+        request1 = request { requestHeaders = userAgentHeader : requestHeaders request }
+    
+    response <- liftIO $ httpLbs request1 manager
+    liftIO $ putStrLn "fetch2"
+
+    let jsonBody = responseBody response :: LZB.ByteString
+    return . fromMaybe (error ("error with api" <> show jsonBody)) . decode $ jsonBody
+
+
+
+
+
+
 --   finding a news article with a specific title or author, and searching by keywords
 
 
