@@ -28,8 +28,6 @@ main = do
   run 8080 (app config)
 
 
-
-
 cleanupCache :: Hashable k => Cache k v -> IO ()
 cleanupCache c = do
   threadDelay (60 * 1000000) -- Delay for cleanup (every 60 seconds)

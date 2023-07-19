@@ -19,9 +19,9 @@ type API = "top-headlines" :>
                   Get '[JSON] Response
 
 
-
 appServer :: ServerT API App 
 appServer = fetchTopNewsHeadlines :<|> fetchSearchedArticles
+
 
 appToServer :: AppConfig -> App a -> Handler a
 appToServer config ap = Handler $ do
