@@ -94,6 +94,7 @@ common shared
     , http-api-data
     , http-types
     , uri-encode
+    , optparse-applicative
 
   hs-source-dirs:     src
   default-language:   Haskell2010
@@ -105,3 +106,4 @@ executable news-api
     NewsAPI
     App
     API
+    AppOptions
