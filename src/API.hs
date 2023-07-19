@@ -6,13 +6,21 @@ import Servant
 
 
 type API = "top-headlines" :> 
-                QueryParam "pageNumber" PageNumber :> 
-                QueryParam "pageSize" PageSize :> 
-                    Get '[JSON] Response
+                QueryParam "pageNumber" PageNumber :>
+                QueryParam "pageSize" PageSize :>
+                  Get '[JSON] Response
+          :<|>
+             "query" :> 
+                QueryParam' '[Required] "queryBy" QueryBy :>
+                QueryParam' '[Required] "query" Query :>
+                QueryParam "pageNumber" PageNumber :>
+                QueryParam "pageSize" PageSize :>
+                  Get '[JSON] Response
+
 
 
 appServer :: ServerT API App 
-appServer = fetchTopNewsArticles
+appServer = fetchTopNewsArticles :<|> fetchSearchedArticles
 
 appToServer :: AppConfig -> App a -> Handler a
 appToServer config ap = Handler $ do
