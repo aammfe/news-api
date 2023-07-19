@@ -1,14 +1,17 @@
 module Main where
 
-import Main.Utf8 qualified as Utf8
 
-{- |
- Main entry point.
+import App
+import API
+import AppOptions
+import Data.Text (pack)
+import Network.Wai.Handler.Warp (run)
 
- The `, run` script will invoke this function.
--}
+
 main :: IO ()
 main = do
-  -- For withUtf8, see https://serokell.io/blog/haskell-with-utf8
-  Utf8.withUtf8 $ do
-    putTextLn "Hello 🌎"
+  key <- readNewsApiKey
+  putStrLn key
+  putStrLn "app is running on port:8080"
+  let config = AppConfig { newsAPIKey = pack key}
+  run 8080 (app config)
