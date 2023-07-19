@@ -3,6 +3,7 @@ module API where
 import App
 import NewsAPI
 import Servant
+import APIData
 
 
 type API = "top-headlines" :> 
@@ -20,7 +21,7 @@ type API = "top-headlines" :>
 
 
 appServer :: ServerT API App 
-appServer = fetchTopNewsArticles :<|> fetchSearchedArticles
+appServer = fetchTopNewsHeadlines :<|> fetchSearchedArticles
 
 appToServer :: AppConfig -> App a -> Handler a
 appToServer config ap = Handler $ do
